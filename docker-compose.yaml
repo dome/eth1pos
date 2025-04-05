@@ -45,7 +45,7 @@ services:
       - ./data/execution-data:/execution-data
       - ./config/metadata:/config
     restart: unless-stopped
-      beacon:
+  beacon:
     image: sigp/lighthouse:latest-unstable
     network_mode: "host"
     command:

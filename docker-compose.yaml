@@ -68,7 +68,7 @@ services:
       - --port=9000
       - --target-peers=100
       - --testnet-dir=/config
-      - --execution-endpoints=http://159.69.82.182:8551
+      - --execution-endpoints=http://${NODE_PUBLIC_IP}:8551
       - --jwt-secrets=/config/jwtsecret
       - --suggested-fee-recipient=${FEE_RECIPIENT}
       - --allow-insecure-genesis-sync
@@ -90,7 +90,7 @@ services:
       - --validators-dir=/validator-keys/keys
       - --secrets-dir=/validator-keys/secrets
       - --init-slashing-protection
-      - --beacon-nodes=http://159.69.82.182:5052
+      - --beacon-nodes=http://${NODE_PUBLIC_IP}:5052
       - --suggested-fee-recipient=${FEE_RECIPIENT}
     volumes:
       - ./config/metadata:/config

@@ -62,7 +62,7 @@ services:
       - --validator-monitor-auto
       - --http-allow-origin=*
       - --listen-address=0.0.0.0
-      - --enr-address=159.69.82.182
+      - --enr-address=${NODE_PUBLIC_IP}
       - --enr-tcp-port=9000
       - --enr-udp-port=9000
       - --port=9000

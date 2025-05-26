@@ -1,45 +1,38 @@
 
 services:
 
-  init-geth:
-    image: ethereum/client-go
+  init-reth:
+    image: ghcr.io/paradigmxyz/reth
     command: >
-       --datadir=/execution-data init /config/genesis.json
+       --datadir /execution-data --chain /config/genesis.json
 
     volumes:
       - ./data/execution-data:/execution-data
       - ./config/metadata:/config
 
-  geth:
-    image: ethereum/client-go:latest
+  reth:
+    image: ghcr.io/paradigmxyz/reth
     depends_on:
-      - init-geth
+      - init-reth
     network_mode: "host"
     command:
-      - --networkid=9555
-      - --state.scheme=path
-      - --verbosity=3
-      - --datadir=/execution-data
-      - --nat=extip:${NODE_PUBLIC_IP}
-      - --http
+      - node
+      - --chain=/config/genesis.json
+      - --datadir=/execution-data 
+      - --http 
+      - --http.corsdomain="*"
       - --http.addr=0.0.0.0
-      - --http.port=8545
-      - --http.vhosts=*
-      - --http.corsdomain=*
-      - --http.api=admin,engine,net,eth,web3,debug,txpool
+      - --http.api=all
       - --ws
       - --ws.addr=0.0.0.0
       - --ws.port=8546
-      - --ws.api=admin,engine,net,eth,web3,debug,txpool
-      - --ws.origins=*
-      - --allow-insecure-unlock
-      - --authrpc.port=8551
+      - --ws.origins="*"
+      - --ws.api=all
       - --authrpc.addr=0.0.0.0
-      - --authrpc.vhosts=*
+      - --authrpc.port=8551
       - --authrpc.jwtsecret=/config/jwtsecret
-      - --syncmode=full
-      - --nodekeyhex=0ad62d8dd53414ff21cc41842c128ccd65231f6d8d537a81f8ff584a2fda7584
-      - --rpc.allow-unprotected-txs
+#  - --bootnodes=$EL_NODES 
+#  - --trusted-peers=$EL_NODES 
 
     volumes:
       - ./data/execution-data:/execution-data
@@ -68,7 +61,7 @@ services:
       - --port=9000
       - --target-peers=100
       - --testnet-dir=/config
-      - --execution-endpoints=http://${NODE_PUBLIC_IP}:8551
+      - --execution-endpoints=http://127.0.0.1:8551
       - --jwt-secrets=/config/jwtsecret
       - --suggested-fee-recipient=${FEE_RECIPIENT}
       - --allow-insecure-genesis-sync
@@ -77,11 +70,12 @@ services:
       - ./config/metadata:/config
       - ./data/lighthouse:/root/.lighthouse/
     depends_on:
-      - geth
+      - reth
     restart: unless-stopped
 
   validator:
     image: sigp/lighthouse:latest-unstable
+    network_mode: "host"
     command:
       - lighthouse
       - vc
@@ -90,8 +84,9 @@ services:
       - --validators-dir=/validator-keys/keys
       - --secrets-dir=/validator-keys/secrets
       - --init-slashing-protection
-      - --beacon-nodes=http://${NODE_PUBLIC_IP}:5052
+      - --beacon-nodes=http://127.0.0.1:5052
       - --suggested-fee-recipient=${FEE_RECIPIENT}
+
     volumes:
       - ./config/metadata:/config
       - ./vc/data:/validator-keys

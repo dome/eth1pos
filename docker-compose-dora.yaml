@@ -1,0 +1,12 @@
+services:
+  dora:
+    image: ethpandaops/dora
+    container_name: dora_explorer
+    user: "0"  # root user
+    network_mode: "host"
+    volumes:
+      - ./config:/config
+    command: ["-config=/config/explorer-config.yaml"]
+    ports:
+      - "8080:8080"
+      
